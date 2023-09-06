@@ -1,0 +1,47 @@
+pipeline{
+    agent any
+    tools {
+        maven 'Maven' // maven spelling M should be capital thus ahead mistake not install the maven 
+    }
+    stages{
+        stage("testmaven"){
+            steps{
+                // mvn test
+                sh 'mvn test'
+                echo "========executing A========"
+            }
+        }
+        stage("buildwarmaven"){
+            steps{
+                // mvn install
+                sh 'mvn package'
+                echo "========executing A========"
+            }
+        }
+        stage("deploy on test"){
+            steps{
+                deploy adapters: [tomcat9(credentialsId: 'tomcatdetails1', path: '', url: 'http://3.109.186.217:8080/')], contextPath: '/app', war: '**/*.war'
+                // deploy to contaier -> plugin
+                echo "========executing A========"
+            }
+        }
+        stage("deploy on build"){
+            steps{
+                // deploy to contaier -> plugin
+                deploy adapters: [tomcat9(credentialsId: 'tomcatdetails1', path: '', url: 'http://65.2.182.90:8080/')], contextPath: '/app1', war: '**/*.war'
+                echo "========executing A========"
+            }
+        }
+    }
+    post{
+        always{
+            echo "========always========"
+        }
+        success{
+            echo "========pipeline executed successfully ========"
+        }
+        failure{
+            echo "========pipeline execution failed========"
+        }
+    }
+}
